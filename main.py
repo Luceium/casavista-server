@@ -66,18 +66,26 @@ class ModelService:
         remesh_option: str = "none",
         target_count: int = 2000,
     ) -> dict:
+        print("Processing image...")
         # Create output directory for this job
         job_dir = self.output_dir / object_name
         job_dir.mkdir(exist_ok=True)
 
         # Process image
+        print("Removing background...")
         image = remove_background(image, self.bg_remover)
+
+        print("Cropping foreground...")
         image = foreground_crop(image, foreground_ratio)
         image.save(job_dir / f"{object_name}.png")
 
         # Generate 3D model
+        print("Generating 3D model...")
+        print("   No grad...")
         with torch.no_grad():
+            print("   Auto casting...")
             with torch.autocast(device_type=self.device, dtype=torch.bfloat16):
+                print("   Running image...")
                 mesh, glob_dict = self.model.run_image(
                     [image],
                     bake_resolution=texture_resolution,
@@ -87,6 +95,7 @@ class ModelService:
                 )
 
         # Save mesh and point cloud
+        print("Save mesh and point cloud...")
         mesh_path = job_dir / f"{object_name}.glb"
         mesh.export(mesh_path, include_normals=True)
         points_path = job_dir / f"{object_name}.ply"
