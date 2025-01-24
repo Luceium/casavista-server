@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  api:
+    build: .
+    image: mindscape-api:v1
+    ports:
+      - 6060:6060
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: "/packages"    
+    # Make sure to use the correct command to start your app
+    command: ["gunicorn", "-c", "gunicorn.conf.py", "api.wsgi:app"]

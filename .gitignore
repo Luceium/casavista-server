@@ -1,0 +1,10 @@
+# dotenv environment variables file
+.env
+
+
+# python environment
+venv/
+
+# pycache
+__pycache__
+packages

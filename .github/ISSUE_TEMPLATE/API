@@ -1,0 +1,38 @@
+---
+name: API
+about: Suggest an API
+title: "[API] [ENHANCEMENT]"
+labels: api
+assignees: ''
+
+---
+
+## What does the API do.
+A clear and concise description of what the API does. For ex: Gets user data from firebase
+
+## What kind of API is it. 
+
+`POST` or `GET` 
+
+## INPUT - What Kind of input does the API take
+What kind of fields are provided to the request (if it's a post request) for ex 
+
+```
+{
+"user_id" : "skdfgbfkdbfkaSDF",
+"phone_number": 457957459 
+}
+```
+
+## OUTPUT - What Kind of output does the API givr back
+What kind of fields are returned by the request for ex 
+
+```
+{
+"user_id" : "skdfgbfkdbfkaSDF",
+"phone_number": 457957459 
+}
+```
+
+## Additional context
+Add any other context or screenshots about the feature request here.

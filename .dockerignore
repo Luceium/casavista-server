@@ -1,0 +1,20 @@
+ # Git files
+.git
+.gitignore
+
+# dotenv environment variables file
+.env
+
+# python environment
+venv/
+
+# pycache
+__pycache__
+
+# Docker ignore Dockerfile itself
+Dockerfile
+docker-compose.yml
+
+# other files or directories not needed in the container
+tests/
+docs/

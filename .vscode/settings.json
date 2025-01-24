@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "mindscape",
+        "mpesa",
+        "nuru",
+        "openai"
+    ],
+    "python.analysis.extraPaths": [
+        "./packages"
+    ]
+}
