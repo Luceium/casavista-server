@@ -134,31 +134,31 @@ async def generate_model(
             f"{object_dir}/{object_name}.glb",
             filename=f"{object_name}.glb",
         )
-    try:
-        # Read and convert image
-        image_path = "castle.png"
-        pil_image = Image.open(image_path).convert("RGBA")
+    # try:
+    # Read and convert image
+    image_path = "castle.png"
+    pil_image = Image.open(image_path).convert("RGBA")
 
-        os.makedirs(f"output/{object_name}", exist_ok=True)
-        temp_image_path = f"output/{object_name}/{object_name}.png"
-        pil_image.save(temp_image_path, format="PNG")
+    os.makedirs(f"output/{object_name}", exist_ok=True)
+    temp_image_path = f"output/{object_name}/{object_name}.png"
+    pil_image.save(temp_image_path, format="PNG")
 
-        # Process image and generate model
-        result = await model_service.process_image(
-            pil_image,
-            object_name,
-            foreground_ratio,
-            texture_resolution,
-            remesh_option,
-            target_count,
-        )
+    # Process image and generate model
+    result = await model_service.process_image(
+        pil_image,
+        object_name,
+        foreground_ratio,
+        texture_resolution,
+        remesh_option,
+        target_count,
+    )
 
-        logging.info("3D model generated!!!")
+    logging.info("3D model generated!!!")
 
-        return FileResponse(
-            result["mesh_path"],
-            filename=f"{object_name}.glb",
-        )
+    return FileResponse(
+        result["mesh_path"],
+        filename=f"{object_name}.glb",
+    )
 
     # except Exception as e:
     #     logging.error("Error during model generation: %s", str(e))

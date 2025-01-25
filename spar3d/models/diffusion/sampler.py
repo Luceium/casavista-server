@@ -80,12 +80,14 @@ class PointCloudSampler:
         Returns:
             Iterator of dicts containing intermediate samples
         """
+        print("sample_batch_progressive")
         if guidance_scale is None:
             guidance_scale = self.guidance_scale
 
         sample_shape = (batch_size, self.point_dim, self.num_points)
 
         # Double the batch for classifier-free guidance
+        print("guidance_scale")
         if guidance_scale != 1 and guidance_scale != 0:
             condition = torch.cat([condition, torch.zeros_like(condition)], dim=0)
             if noise is not None:
@@ -99,6 +101,7 @@ class PointCloudSampler:
         else:
             model = self.model
 
+        print("Diffusion loop")
         samples_it = self.diffusion.ddim_sample_loop_progressive(
             model,
             shape=(internal_batch_size, *sample_shape[1:]),

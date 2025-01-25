@@ -531,6 +531,7 @@ class SPAR3D(BaseModule):
         return scene_codes, direct_codes
 
     def forward_pdiff_cond(self, batch: Dict[str, Any]) -> Dict[str, Any]:
+        print("Forward pdiff cond...")
         if self.is_low_vram:
             self._unload_main_modules()
             self._unload_estimator_modules()
@@ -706,20 +707,27 @@ class SPAR3D(BaseModule):
             pointcloud = torch.cat([xyz, color_rgb], dim=-1).unsqueeze(0)
             batch["pc_cond"] = pointcloud
 
+        print("Checking if pc_cond is in batch...")
         if "pc_cond" not in batch:
+            print("pc_cond not in batch...")
             cond_tokens = self.forward_pdiff_cond(batch)
+            print("Sampling batch progressive...")
             sample_iter = self.sampler.sample_batch_progressive(
                 batch_size, cond_tokens, device=self.device
             )
+            print("Iterating through sample_iter...")
             for x in sample_iter:
                 samples = x["xstart"]
 
+            print("Permute samples...")
             denoised_pc = samples.permute(0, 2, 1).float()  # [B, C, N] -> [B, N, C]
+            print("Normalize point cloud bounding box...")
             denoised_pc = normalize_pc_bbox(denoised_pc)
 
             # predict the full 3D conditioned on the denoised point cloud
             batch["pc_cond"] = denoised_pc
 
+        print("Getting scene codes...")
         scene_codes, non_postprocessed_codes = self.get_scene_codes(batch)
 
         # Create a rotation matrix for the final output domain
