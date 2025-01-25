@@ -1,25 +1,23 @@
+# from fastapi import FastAPI, UploadFile, File, HTTPException
+# from fastapi.responses import FileResponse, JSONResponse
+from typing import Optional, List
 from io import BytesIO
 import random
 import logging
 import os
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Optional, List
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
-import torch
-import numpy as np
+# import torch
+# import numpy as np
 import requests
-from PIL import Image
-import rembg
-import xatlas
+# import rembg
 import uvicorn
 import io
 from PIL import Image
-from transparent_background import Remover
+# from transparent_background import Remover
 
-from spar3d.system import SPAR3D
-from spar3d.utils import remove_background, foreground_crop
+# from spar3d.system import SPAR3D
+# from spar3d.utils import remove_background, foreground_crop
 
 from utils import clean_image, save_image, save_mesh, save_points, search
 # from dotenv import load_dotenv

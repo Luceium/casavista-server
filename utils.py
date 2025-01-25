@@ -1,3 +1,10 @@
+from PIL import Image
+from fastapi.responses import FileResponse
+import os
+from transparent_background import Remover
+import trimesh
+
+
 def clean_image(image: Image.Image) -> Image.Image:
     """Remove the background from an image."""
     image = image.convert("RGBA")
