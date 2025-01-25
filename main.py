@@ -160,9 +160,10 @@ async def generate_model(
             filename=f"{object_name}.glb",
         )
 
-    except Exception as e:
-        logging.error("Error during model generation: %s", str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+    # except Exception as e:
+    #     logging.error("Error during model generation: %s", str(e))
+        
+    #     raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

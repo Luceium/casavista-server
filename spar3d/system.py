@@ -569,27 +569,38 @@ class SPAR3D(BaseModule):
         estimate_illumination: bool = False,
         return_points: bool = False,
     ) -> Tuple[Union[trimesh.Trimesh, List[trimesh.Trimesh]], dict[str, Any]]:
+        print("Running image...")
         if isinstance(image, list):
+            print("Multiple images detected...")
             rgb_cond = []
             mask_cond = []
             for img in image:
+                print("Processing image...")
                 mask, rgb = self.prepare_image(img)
+                print("Appending mask...")
                 mask_cond.append(mask)
+                print("rgb_cond...")
                 rgb_cond.append(rgb)
+            print("Stacking rgb_cond...")
             rgb_cond = torch.stack(rgb_cond, 0)
+            print("Stacking mask_cond...")
             mask_cond = torch.stack(mask_cond, 0)
             batch_size = rgb_cond.shape[0]
         else:
+            print("Single image detected...")
             mask_cond, rgb_cond = self.prepare_image(image)
             batch_size = 1
 
+        print("Default c2w...")
         c2w_cond = default_cond_c2w(self.cfg.default_distance).to(self.device)
+        print("Create intrinsic...")
         intrinsic, intrinsic_normed_cond = create_intrinsic_from_fov_rad(
             self.cfg.default_fovy_rad,
             self.cfg.cond_image_size,
             self.cfg.cond_image_size,
         )
 
+        print("Making batch...")
         batch = {
             "rgb_cond": rgb_cond,
             "mask_cond": mask_cond,
@@ -602,6 +613,7 @@ class SPAR3D(BaseModule):
             .repeat(batch_size, 1, 1, 1),
         }
 
+        print("Generate mesh")
         meshes, global_dict = self.generate_mesh(
             batch,
             bake_resolution,
@@ -611,6 +623,7 @@ class SPAR3D(BaseModule):
             estimate_illumination,
         )
 
+        print("Save mesh and point cloud...")
         if return_points:
             point_clouds = []
             for i in range(batch_size):
@@ -659,29 +672,37 @@ class SPAR3D(BaseModule):
         vertex_count: int = -1,
         estimate_illumination: bool = False,
     ) -> Tuple[List[trimesh.Trimesh], dict[str, Any]]:
+        print("image processor rgb...")
         batch["rgb_cond"] = self.image_processor(
             batch["rgb_cond"], self.cfg.cond_image_size
         )
+        print("image processor mask...")
         batch["mask_cond"] = self.image_processor(
             batch["mask_cond"], self.cfg.cond_image_size
         )
 
+        print("Get device...")
         device = get_device()
+        print("device:", device)
 
         batch_size = batch["rgb_cond"].shape[0]
 
         if pointcloud is not None:
+            print("Checking if point cloud is a list or numpy array...")
             if isinstance(pointcloud, list):
+                print("Point cloud is a list...")
                 cond_tensor = torch.tensor(pointcloud).float().to(device).view(-1, 6)
                 xyz = cond_tensor[:, :3]
                 color_rgb = cond_tensor[:, 3:]
             # Check if point cloud is a numpy array
             elif isinstance(pointcloud, np.ndarray):
+                print("Point cloud is a numpy array...")
                 xyz = torch.tensor(pointcloud[:, :3]).float().to(device)
                 color_rgb = torch.tensor(pointcloud[:, 3:]).float().to(device)
             else:
                 raise ValueError("Invalid point cloud type")
 
+            print("Concatenating xyz and color_rgb...")
             pointcloud = torch.cat([xyz, color_rgb], dim=-1).unsqueeze(0)
             batch["pc_cond"] = pointcloud
 
@@ -702,16 +723,19 @@ class SPAR3D(BaseModule):
         scene_codes, non_postprocessed_codes = self.get_scene_codes(batch)
 
         # Create a rotation matrix for the final output domain
+        print("Creating rotation matrix...")
         rotation = trimesh.transformations.rotation_matrix(np.radians(-90), [1, 0, 0])
         rotation2 = trimesh.transformations.rotation_matrix(np.radians(90), [0, 1, 0])
         output_rotation = rotation2 @ rotation
 
         global_dict = {}
+        print("Checking if low VRAM mode is enabled...")
         if self.is_low_vram:
             self._unload_pdiff_modules()
             self._unload_main_modules()
             self._load_estimator_modules()
 
+        print("Checking if image estimator is not None...")
         if self.image_estimator is not None:
             global_dict.update(
                 self.image_estimator(
@@ -730,6 +754,7 @@ class SPAR3D(BaseModule):
 
         global_dict["pointcloud"] = batch["pc_cond"]
 
+        print("Some point later")
         device = get_device()
         with torch.no_grad():
             with (
@@ -742,10 +767,12 @@ class SPAR3D(BaseModule):
                 rets = []
                 for i, mesh in enumerate(meshes):
                     # Check for empty mesh
+                    print("Checking for empty mesh...")
                     if mesh.v_pos.shape[0] == 0:
                         rets.append(trimesh.Trimesh())
                         continue
 
+                    print("Remeshing...")
                     if remesh == "triangle":
                         mesh = mesh.triangle_remesh(triangle_vertex_count=vertex_count)
                     elif remesh == "quad":
@@ -763,11 +790,13 @@ class SPAR3D(BaseModule):
                         mesh.unwrap_uv()
 
                     # Build textures
+                    print("Baking textures...")
                     rast = self.baker.rasterize(
                         mesh.v_tex, mesh.t_pos_idx, bake_resolution
                     )
                     bake_mask = self.baker.get_mask(rast)
 
+                    print("Interpolating position...")
                     pos_bake = self.baker.interpolate(
                         mesh.v_pos,
                         rast,
@@ -775,11 +804,13 @@ class SPAR3D(BaseModule):
                     )
                     gb_pos = pos_bake[bake_mask]
 
+                    print("Querying triplane...")
                     tri_query = self.query_triplane(gb_pos, scene_codes[i])[0]
                     decoded = self.decoder(
                         tri_query, exclude=["density", "vertex_offset"]
                     )
 
+                    print("Interpolating normal...")
                     nrm = self.baker.interpolate(
                         mesh.v_nrm,
                         rast,
@@ -852,6 +883,7 @@ class SPAR3D(BaseModule):
                                 mat_out[k] = f
 
                     def uv_padding(arr):
+                        print("UV Padding...")
                         if arr.ndim == 1:
                             return arr
                         return (
@@ -869,6 +901,7 @@ class SPAR3D(BaseModule):
                     faces = convert_data(mesh.t_pos_idx)
                     uvs = convert_data(mesh.v_tex)
 
+                    print("Creating base color texture...")
                     basecolor_tex = Image.fromarray(
                         float32_to_uint8_np(convert_data(uv_padding(mat_out["albedo"])))
                     ).convert("RGB")
@@ -898,6 +931,7 @@ class SPAR3D(BaseModule):
                     else:
                         bump_tex = None
 
+                    print("Creating trimesh...")
                     material = trimesh.visual.material.PBRMaterial(
                         baseColorTexture=basecolor_tex,
                         roughnessFactor=roughness,
