@@ -1,0 +1,4 @@
+# ninja log v6
+0	2295	1737754311957594020	/home/luceium/git/CasaVista/server/uv_unwrapper/build/temp.linux-x86_64-cpython-312/uv_unwrapper/csrc/bvh.o	bd96d90c59b8c8f8
+1	2536	1737754311958594021	/home/luceium/git/CasaVista/server/uv_unwrapper/build/temp.linux-x86_64-cpython-312/uv_unwrapper/csrc/intersect.o	4c559e384c3f033d
+1	32746	1737754311958594021	/home/luceium/git/CasaVista/server/uv_unwrapper/build/temp.linux-x86_64-cpython-312/uv_unwrapper/csrc/unwrapper.o	84414ba0772659c1
