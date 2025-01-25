@@ -23,8 +23,6 @@ from transparent_background import Remover
 from spar3d.system import SPAR3D
 from spar3d.utils import remove_background, foreground_crop
 
-from generate.txt2img import generate_image
-from generate.img2glb.img2glb import ModelService
 from utils import clean_image, save_image, save_mesh, save_points, search
 # from dotenv import load_dotenv
 # import boto3
