@@ -2,7 +2,7 @@ from voice_txt import get_transcript
 from txt_img import generate_image
 from img_3d.img_3d import ModelService
 from PIL import Image
-from fastapi import FileResponse
+from fastapi.responses import FileResponse  # Fix import
 
 def voice_3d(model_service: ModelService):
     obj_desc = get_transcript() # TODO: voice-to-text
