@@ -1,5 +1,3 @@
-# main.py
-# from cache_utils import CacheServer
 from io import BytesIO
 import random
 import logging
