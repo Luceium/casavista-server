@@ -87,5 +87,9 @@ async def generate_model(
         
         raise HTTPException(status_code=500, detail=str(e))
 
+    @app.get("test")
+    async def test_model():
+        return FileResponse("test_material/test.glb")
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
