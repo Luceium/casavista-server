@@ -6,9 +6,6 @@ import torchvision.transforms.functional as torchvision_F
 from PIL import Image
 from transparent_background import Remover
 
-import spar3d.models.utils as spar3d_utils
-
-
 def get_device():
     if os.environ.get("SPAR3D_USE_CPU", "0") == "1":
         return "cpu"

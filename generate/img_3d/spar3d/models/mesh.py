@@ -10,7 +10,7 @@ import trimesh
 from jaxtyping import Float, Integer
 from torch import Tensor
 
-from spar3d.models.utils import dot
+from .utils import dot
 
 import os
 import sys

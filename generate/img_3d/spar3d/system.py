@@ -15,15 +15,15 @@ from PIL import Image
 from safetensors.torch import load_file, load_model
 from torch import Tensor
 
-from spar3d.models.diffusion.gaussian_diffusion import (
+from .models.diffusion.gaussian_diffusion import (
     SpacedDiffusion,
     get_named_beta_schedule,
     space_timesteps,
 )
-from spar3d.models.diffusion.sampler import PointCloudSampler
-from spar3d.models.isosurface import MarchingTetrahedraHelper
-from spar3d.models.mesh import Mesh
-from spar3d.models.utils import (
+from .models.diffusion.sampler import PointCloudSampler
+from .models.isosurface import MarchingTetrahedraHelper
+from .models.mesh import Mesh
+from .models.utils import (
     BaseModule,
     ImageProcessor,
     convert_data,
@@ -33,7 +33,7 @@ from spar3d.models.utils import (
     normalize,
     scale_tensor,
 )
-from spar3d.utils import (
+from .utils import (
     create_intrinsic_from_fov_rad,
     default_cond_c2w,
     get_device,

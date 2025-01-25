@@ -1,9 +1,13 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: texture_baker
 Version: 0.0.1
 Summary: Small texture baker which rasterizes barycentric coordinates to a tensor.
 Home-page: https://github.com/Stability-AI/texture_baker
 Description-Content-Type: text/markdown
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: summary
 
 # Texture baker
 

@@ -2,6 +2,7 @@ from PIL import Image
 from fastapi.responses import FileResponse
 import os
 from transparent_background import Remover
+from generate.img_3d.spar3d.utils import foreground_crop, remove_background
 import trimesh
 
 
@@ -32,7 +33,7 @@ def search(obj_desc: str) -> FileResponse:
 
 def cache_search(obj_desc: str) -> FileResponse:
     # Check if folder with the object name exists
-    if os.path.isdir(obj_dir):
+    if os.path.isdir(obj_desc):
         return FileResponse(
             f"{obj_dir}/model.glb",
             filename=f"model.glb",

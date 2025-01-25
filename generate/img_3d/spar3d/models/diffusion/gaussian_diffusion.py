@@ -29,7 +29,7 @@ from typing import Any, Dict, Iterable, Optional, Sequence, Union
 import numpy as np
 import torch as th
 
-from spar3d.utils import get_device
+from ...utils import get_device
 
 
 def sigmoid_schedule(t, start=-3, end=3, tau=0.6, clip_min=1e-9):
