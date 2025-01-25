@@ -1,9 +1,6 @@
 import logging
 
-from flask import jsonify, make_response, render_template
-from werkzeug.exceptions import BadRequest
-
-from api.utils import check_fields_in_request, handle_response_exception
+from flask import jsonify
 import tempfile
 from .transcribe import *
 from flask import (
@@ -24,21 +21,7 @@ def test():
     data = {"message": "transcribe works well"}
     return jsonify(data), 200
 
-@bp.route("/openai", methods=['POST'])
-# @auth_guard
-def openai_transcribe():
-    request_data = request.get_json()
-    check_fields_in_request(request_data, ["filePath"])
-    file_path = request_data.get("filePath").strip()
 
-    try:
-        # in the form of {'transcript': transcript, 'segments': transcript.segments}
-        result = transcribe_large_audio(file_path=file_path)
-        data = {"message": "transcription successful", "data": result}
-        return jsonify(data), 200
-    
-    except Exception as e:
-        return handle_response_exception(e)
 
 # @bp.route("/whisper", methods=['POST'])
 # # @auth_guard

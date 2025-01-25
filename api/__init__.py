@@ -54,7 +54,7 @@ logging.config.dictConfig(dict_config)
 
 from api import exception_views
 from api.voice import voice_views
-from api.generate import generate_views
+from api.transcribe import transcribe_views
 from common.utils import safe_get_env_var
 
 
@@ -145,5 +145,5 @@ def create_app():
     ##########################################
     app.register_blueprint(exception_views.bp)
     app.register_blueprint(voice_views.bp)
-    app.register_blueprint(generate_views.bp)
+    app.register_blueprint(transcribe_views.bp)
     return app
