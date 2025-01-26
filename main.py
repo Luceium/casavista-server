@@ -34,6 +34,10 @@ app = FastAPI(title="3D Model Generation API")
 # Initialize model service at startup
 # model_service = None
 
+# dictionary of jobs
+# ex. {int: {step: int, progress: int, model_path: str}}
+jobs = {}
+
 @app.on_event("startup")
 async def startup_event():
     logging.info("Starting up...")
@@ -42,34 +46,12 @@ async def startup_event():
     # global model_service
     # model_service = ModelService()
 
-@app.get("/generate/{obj_desc}")
-async def get_or_generate_model_txt_to_gbl(
-    obj_desc: str #,
-    # foreground_ratio: float = 1.3,
-    # texture_resolution: int = 1024,
-    # remesh_option: str = "none",
-    # target_count: int = 2000,
-):
-    logging.info("Request received for"+ obj_desc)
-    newObjectDir = "".join(obj_desc.split(" "))
-    output_dir = "output/"
-    obj_dir = os.path.join(output_dir, newObjectDir)
+@app.get("/status/{job_id}")
+async def status(job_id: str):
+    return JSONResponse(content=jobs[job_id])
 
-    res = search(obj_desc)
-    if res:
-        return res
-    
-    try:
-        return voice_3d()
-    except Exception as e:
-        logging.error("Error during model generation: %s", str(e))
-        
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/test")
-def test(request_body: dict = Body(...)):
-    print(request_body)
-    return FileResponse("test_material/test.glb")
+@app.get("/model/{job_id}")
 
 @app.put("/generate")
 async def get_or_generate_model(request_body: dict = Body(...)):
@@ -96,29 +78,6 @@ async def get_or_generate_model(request_body: dict = Body(...)):
     except Exception as e:
         logging.error("Error during model generation: %s", str(e))
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/generate/new/{obj_desc}")
-async def generate_model(
-    obj_desc: str #,
-    # foreground_ratio: float = 1.3,
-    # texture_resolution: int = 1024,
-    # remesh_option: str = "none",
-    # target_count: int = 2000,
-):
-    logging.info("Request received for"+ obj_desc)
-    output_dir = "output/"
-    obj_dir = os.path.join(output_dir, obj_desc)
-
-    try:
-        return voice_3d()
-    except Exception as e:
-        logging.error("Error during model generation: %s", str(e))
-        
-        raise HTTPException(status_code=500, detail=str(e))
-
-    @app.get("test")
-    async def test_model():
-        return FileResponse("test_material/test.glb")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
