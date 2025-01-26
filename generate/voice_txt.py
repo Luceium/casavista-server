@@ -77,7 +77,9 @@ def transcribe_with_faster_whisper(file_path: str, model_size: str = "base", com
 
     segments, _ = model.transcribe(file_path, beam_size=5)
     # segment_list = [{"start": segment.start, "end": segment.end, "text": segment.text} for segment in segments]
-    text = " ".join([segment.text for segment in segments])
+    segments = [segment.text for segment in segments]
+    print(segments)
+    text = segments[0] if len(segments) == 1 else " ".join([segment.text for segment in segments])
     print("Got transcript: ", text)
     return text
 

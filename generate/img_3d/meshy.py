@@ -6,7 +6,6 @@ def txt_glb(prompt: str):
     headers = {
         "Authorization": f"Bearer {os.getenv('MESHY_API_KEY')}"
     }
-    print("APIIIIIIIIIIIIIIIIIIIIII", headers)
 
     # 1. Generate a preview model and get the task ID
 
@@ -59,8 +58,9 @@ def txt_glb(prompt: str):
     preview_model_response.raise_for_status()
 
 
-    os.mkdir(f"output/{prompt}")
-    with open(f"output/{obj_desc}/preview_model.glb", "wb") as f:
+    print(f'Make `output/{"".join(prompt.split(" "))}`')
+    os.mkdir(f'output/{"".join(prompt.split(" "))}')
+    with open(f'output/{"".join(prompt.split(" "))}/preview_model.glb', "wb") as f:
         f.write(preview_model_response.content)
 
     print("Preview model downloaded.")
@@ -112,8 +112,8 @@ def txt_glb(prompt: str):
     refined_model_response = requests.get(refined_model_url)
     refined_model_response.raise_for_status()
 
-    os.mkdir(f"output/{prompt}")
-    with open(f"output/{prompt}/model.glb", "wb") as f:
+    os.mkdir(f'output/{"".join(prompt.split(" "))}')
+    with open(f'output/{"".join(prompt.split(" "))}/model.glb', "wb") as f:
         f.write(refined_model_response.content)
 
     print("Refined model downloaded.")

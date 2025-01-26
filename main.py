@@ -37,6 +37,7 @@ app = FastAPI(title="3D Model Generation API")
 @app.on_event("startup")
 async def startup_event():
     logging.info("Starting up...")
+    os.mkdir("output")
     # global model_service
     # model_service = ModelService()
 
@@ -48,9 +49,10 @@ async def get_or_generate_model_txt_to_gbl(
     # remesh_option: str = "none",
     # target_count: int = 2000,
 ):
-    logging.info("Request received for", obj_desc)
+    logging.info("Request received for"+ obj_desc)
+    newObjectDir = "".join(obj_desc.split(" "))
     output_dir = "output/"
-    obj_dir = os.path.join(output_dir, obj_desc)
+    obj_dir = os.path.join(output_dir, newObjectDir)
 
     res = search(obj_desc)
     if res:
@@ -64,11 +66,13 @@ async def get_or_generate_model_txt_to_gbl(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/test")
-def test():
-    return JSONResponse(content={"message": "Hello, World!"})
+def test(request_body: dict = Body(...)):
+    print(request_body)
+    return FileResponse("test_material/test.glb")
 
-@app.post("/generate")
+@app.put("/generate")
 async def get_or_generate_model(request_body: dict = Body(...)):
+    print(request_body)
     file_path = request_body.get("filePath")
     if not file_path:
         raise HTTPException(status_code=400, detail="filePath is required")
@@ -78,7 +82,7 @@ async def get_or_generate_model(request_body: dict = Body(...)):
 
     print("completed transcription")
 
-    logging.info("Request received for", obj_desc)
+    logging.info("Request received for"+ obj_desc)
     output_dir = "output/"
     obj_dir = os.path.join(output_dir, obj_desc)
 
@@ -100,7 +104,7 @@ async def generate_model(
     # remesh_option: str = "none",
     # target_count: int = 2000,
 ):
-    logging.info("Request received for", obj_desc)
+    logging.info("Request received for"+ obj_desc)
     output_dir = "output/"
     obj_dir = os.path.join(output_dir, obj_desc)
 
