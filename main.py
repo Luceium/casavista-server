@@ -55,15 +55,20 @@ async def status(job_id: str):
 async def download_model(job_id: str):
     pass
 
-@app.put("/transcribe")
-async def server_describe(request_body: dict = Body(...)):
-    print(request_body)
-    file_path = request_body.get("filePath")
-    if not file_path:
-        raise HTTPException(status_code=400, detail="filePath is required")
+@app.post("/transcribe")
+async def server_describe(file: UploadFile = File(...)):
+    if not file:
+        raise HTTPException(status_code=400, detail="file is required")
+
+    temp_file_path = f"/tmp/{file.filename}"
+    with open(temp_file_path, "wb") as temp_file:
+        temp_file.write(await file.read())
 
     print("transcribing voice data")
-    obj_desc = get_transcript(file_path)
+    obj_desc = get_transcript(temp_file_path)
+
+    # delete tmp file
+    os.remove(temp_file_path)
 
     print(f"completed transcription: {obj_desc}")
     return JSONResponse(content={"data" : obj_desc})
@@ -86,6 +91,14 @@ async def get_or_generate_model(request_body: dict = Body(...)):
     except Exception as e:
         logging.error("Error during model generation: %s", str(e))
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/")
+def test_remote():
+    return JSONResponse(content={"hello":"world"})
+
+@app.get("/test")
+def test_remote():
+    return JSONResponse(content={"hello":"world"})
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
