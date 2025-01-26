@@ -35,7 +35,7 @@ app = FastAPI(title="3D Model Generation API")
 # model_service = None
 
 # dictionary of jobs
-# ex. {int: {step: int, progress: int, model_path: str}}
+# ex. {job_id: {step, progress, model_path}}
 jobs = {}
 
 @app.on_event("startup")
@@ -52,18 +52,25 @@ async def status(job_id: str):
 
 
 @app.get("/model/{job_id}")
+async def download_model(job_id: str):
+    pass
 
-@app.put("/generate")
-async def get_or_generate_model(request_body: dict = Body(...)):
+@app.put("/transcribe")
+async def server_describe(request_body: dict = Body(...)):
     print(request_body)
     file_path = request_body.get("filePath")
     if not file_path:
         raise HTTPException(status_code=400, detail="filePath is required")
 
     print("transcribing voice data")
-    obj_desc = get_transcript(file_path)  # TODO: voice-to-text
+    obj_desc = get_transcript(file_path)
 
-    print("completed transcription")
+    print(f"completed transcription: {obj_desc}")
+    return JSONResponse(content={"data" : obj_desc})
+
+@app.put("/generate")
+async def get_or_generate_model(request_body: dict = Body(...)):
+    obj_desc = request_body.get("obj_desc")
 
     logging.info("Request received for"+ obj_desc)
     output_dir = "output/"
@@ -74,7 +81,8 @@ async def get_or_generate_model(request_body: dict = Body(...)):
         return res
     
     try:
-        return txt_3d(obj_desc)
+        # return txt_3d(obj_desc)
+        return FileResponse("test_material/test.glb")
     except Exception as e:
         logging.error("Error during model generation: %s", str(e))
         raise HTTPException(status_code=500, detail=str(e))

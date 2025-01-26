@@ -8,10 +8,7 @@ from faster_whisper import WhisperModel
 import torch
 from fastapi.responses import JSONResponse
 
-def get_transcript(file_path):
-    print("start transcribing")
-    print(f"File path received: {file_path}")
-    
+def get_transcript(file_path):    
     # Validate input
     if not file_path:
         print("error: File path is missing")
@@ -78,9 +75,7 @@ def transcribe_with_faster_whisper(file_path: str, model_size: str = "base", com
     segments, _ = model.transcribe(file_path, beam_size=5)
     # segment_list = [{"start": segment.start, "end": segment.end, "text": segment.text} for segment in segments]
     segments = [segment.text for segment in segments]
-    print(segments)
     text = segments[0] if len(segments) == 1 else " ".join([segment.text for segment in segments])
-    print("Got transcript: ", text)
     return text
 
 
