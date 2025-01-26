@@ -1,5 +1,6 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Body
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.encoders import jsonable_encoder
 from typing import Optional, List
 from io import BytesIO
 import random
@@ -15,23 +16,18 @@ import uvicorn
 import io
 from PIL import Image
 from transparent_background import Remover
-from .generate.voice_txt import get_transcript
+from generate.voice_txt import get_transcript
 
 # from generate.img_3d.spar3d.system import SPAR3D
 from generate.img_3d.spar3d.utils import remove_background, foreground_crop
 # from generate.img_3d.img_3d import ModelService
-from generate.voice_3d import voice_3d
+from generate.voice_3d import txt_3d
 
 from utils import clean_image, save_image, save_mesh, save_points, search
 from dotenv import load_dotenv
 # import boto3
 
 load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
-)
 
 app = FastAPI(title="3D Model Generation API")
 
@@ -46,11 +42,11 @@ async def startup_event():
 
 @app.get("/generate/{obj_desc}")
 async def get_or_generate_model_txt_to_gbl(
-    obj_desc: str,
-    foreground_ratio: float = 1.3,
-    texture_resolution: int = 1024,
-    remesh_option: str = "none",
-    target_count: int = 2000,
+    obj_desc: str #,
+    # foreground_ratio: float = 1.3,
+    # texture_resolution: int = 1024,
+    # remesh_option: str = "none",
+    # target_count: int = 2000,
 ):
     logging.info("Request received for", obj_desc)
     output_dir = "output/"
@@ -67,17 +63,20 @@ async def get_or_generate_model_txt_to_gbl(
         
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/test")
+def test():
+    return JSONResponse(content={"message": "Hello, World!"})
 
+@app.post("/generate")
+async def get_or_generate_model(request_body: dict = Body(...)):
+    file_path = request_body.get("filePath")
+    if not file_path:
+        raise HTTPException(status_code=400, detail="filePath is required")
 
-@app.post("/generate/")
-async def get_or_generate_model(
-    voice_data: object,
-    foreground_ratio: float = 1.3,
-    texture_resolution: int = 1024,
-    remesh_option: str = "none",
-    target_count: int = 2000,
-):
-    obj_desc = get_transcript(voice_data) # TODO: voice-to-text
+    print("transcribing voice data")
+    obj_desc = get_transcript(file_path)  # TODO: voice-to-text
+
+    print("completed transcription")
 
     logging.info("Request received for", obj_desc)
     output_dir = "output/"
@@ -88,20 +87,18 @@ async def get_or_generate_model(
         return res
     
     try:
-        return voice_3d()
-
+        return txt_3d(obj_desc)
     except Exception as e:
         logging.error("Error during model generation: %s", str(e))
-        
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/generate/new/{obj_desc}")
 async def generate_model(
-    obj_desc: str,
-    foreground_ratio: float = 1.3,
-    texture_resolution: int = 1024,
-    remesh_option: str = "none",
-    target_count: int = 2000,
+    obj_desc: str #,
+    # foreground_ratio: float = 1.3,
+    # texture_resolution: int = 1024,
+    # remesh_option: str = "none",
+    # target_count: int = 2000,
 ):
     logging.info("Request received for", obj_desc)
     output_dir = "output/"

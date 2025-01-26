@@ -31,6 +31,7 @@ def txt_3d(obj_desc): #model_service: ModelService):
     # # save_points(point_cloud, f"{obj_dir}/cloud.ply")
 
     # logging.info("3D model generated!!!")
+    obj_dir = f"output/{obj_desc}"
 
     return FileResponse(
         f"{obj_dir}/model.glb",
