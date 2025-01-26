@@ -59,7 +59,8 @@ def txt_glb(prompt: str):
 
 
     print(f'Make `output/{"".join(prompt.split(" "))}`')
-    os.mkdir(f'output/{"".join(prompt.split(" "))}')
+    if not os.path.exists(f'output/{"".join(prompt.split(" "))}'):
+        os.mkdir(f'output/{"".join(prompt.split(" "))}')
     with open(f'output/{"".join(prompt.split(" "))}/preview_model.glb', "wb") as f:
         f.write(preview_model_response.content)
 
@@ -112,7 +113,6 @@ def txt_glb(prompt: str):
     refined_model_response = requests.get(refined_model_url)
     refined_model_response.raise_for_status()
 
-    os.mkdir(f'output/{"".join(prompt.split(" "))}')
     with open(f'output/{"".join(prompt.split(" "))}/model.glb', "wb") as f:
         f.write(refined_model_response.content)
 

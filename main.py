@@ -37,7 +37,8 @@ app = FastAPI(title="3D Model Generation API")
 @app.on_event("startup")
 async def startup_event():
     logging.info("Starting up...")
-    os.mkdir("output")
+    if not os.path.exists("output"):
+        os.mkdir("output")
     # global model_service
     # model_service = ModelService()
 
